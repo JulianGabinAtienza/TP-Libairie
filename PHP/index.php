@@ -35,6 +35,7 @@ if (isset($_SESSION["user_id"])) {
                 <?php if (isset($user)): ?>
 
                     <li><a href="search.html">Search</a></li>
+                    <li><a href="profile.php">Profile</a></li>
                     <li><a href="logout.php">Log Out</a></li>
                     
                 <?php else: ?>
