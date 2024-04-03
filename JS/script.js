@@ -85,7 +85,9 @@ function search() {
                         <button><a href="${book.volumeInfo.previewLink}" target="_blank">Preview</a></button>
                         <button class="favoris" data-id="${book.id}">Favoris</button>
                     `;
+
                     const favoriButton = bookCard.querySelector('.favoris');
+
                     favoriButton.addEventListener('click', (e) => {
                         const id = e.target.getAttribute('data-id');
                         const isFavori = favoriButton.classList.toggle('isFavori');
@@ -274,31 +276,31 @@ function createBookCard(book) {
         localStorage.setItem('favorites', JSON.stringify(favorites));
     });
 
-    favoriButton.addEventListener('click', (e) => {
-        const id = e.target.getAttribute('data-id');
-        console.log(id);
-        const isFavori = favoriButton.classList.toggle('isFavori');
-        fetch('favorite.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ bookId: id })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); // Assuming PHP script sends back some response
-        })
-        .then(data => {
-            console.log(data); // Assuming PHP script sends back some response
-            // Handle UI changes or further logic if needed
-        })
-        .catch(error => {
-            console.error('There was a problem with your fetch operation:', error);
-        });
-    });
+    // favoriButton.addEventListener('click', (e) => {
+    //     const id = e.target.getAttribute('data-id');
+    //     console.log(id);
+    //     const isFavori = favoriButton.classList.toggle('isFavori');
+    //     fetch('favorite.php', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({ bookId: id })
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok');
+    //         }
+    //         return response.text(); // Assuming PHP script sends back some response
+    //     })
+    //     .then(data => {
+    //         console.log(data); // Assuming PHP script sends back some response
+    //         // Handle UI changes or further logic if needed
+    //     })
+    //     .catch(error => {
+    //         console.error('There was a problem with your fetch operation:', error);
+    //     });
+    // });
 
     bookCard.innerHTML = `
         <img src="${thumbnail}" alt="${thumbnail}">

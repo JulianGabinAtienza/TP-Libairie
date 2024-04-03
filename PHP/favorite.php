@@ -1,38 +1,20 @@
 <?php
 
-// Database connection details
-$host = "localhost";
-$dbname = "login_db";
-$username = "root";
-$password = "";
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: *");
 
-// Create a new mysqli object for database connection
-$mysqli = new mysqli($host, $username, $password, $dbname);
+$requestBody = file_get_contents('php://input'); // recup l'objet recu en post avec fetch
+$data = json_decode($requestBody, true); // decode depuis json
+// $parsed = parse_str($requestBody, $data);
 
-// Check for connection errors
-if ($mysqli->connect_errno) {
-    die("Connection error: " . $mysqli->connect_error);
-}
+echo json_encode($data);
 
-// Assuming you have a database connection already established
-// Insert the book ID into the database
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["bookId"])) {
-    $bookId = $_POST["bookId"];
-    
-    // Insert $bookId into your database table
-    $stmt = $mysqli->prepare("INSERT INTO user (favorites) VALUES (?)");
-    $stmt->bind_param("s", $bookId);
-    
-    if ($stmt->execute()) {
-        echo "Book favorited successfully";
-    } else {
-        echo "Error: " . $mysqli->error;
-    }
+// Recup les infos du user depuis la session (créee après que le user soit logged in)
 
-    // Close the statement
-    $stmt->close();
-}
+// Ajouter le favori dans la base de données
 
-// Close the database connection
-$mysqli->close();
+// dans une table favoris par exemple avec les colonnes id, user_id, title, content
+// on pourrait dans content avoir un objet des favoris en json
+
 ?>
