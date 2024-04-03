@@ -29,8 +29,6 @@ const btn = document.createElement('button'); btn.textContent = 'Search';
 const favorisBtn = document.createElement('button'); favorisBtn.textContent = 'Favoris'; favorisBtn.classList.add('favlist');
 const favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Retrieve favorites from localStorage
 
-const hr = document.createElement('hr');
-
 const container = document.createElement('div'); container.classList.add('container');
 
 // Organisation des éléments
@@ -41,7 +39,6 @@ form.appendChild(select)
 form.appendChild(favorisBtn)
 form.appendChild(btn)
 
-body.appendChild(hr)
 body.appendChild(container);
 
 function search() {
@@ -182,6 +179,7 @@ function showFavorites() {
                     }
                     favoriButton.textContent = 'Ajouter aux favoris';
                     favoriButton.style.backgroundColor = '#efefef';
+                    favoriButton.style.color = 'black';
                 }
                 localStorage.setItem('favorites', JSON.stringify(favorites)); // Stocker les favoris dans le localStorage
                 console.log(isFavori ? 'Ajout du livre aux favoris:' : 'Retrait du livre des favoris:', book);
@@ -208,4 +206,142 @@ input.addEventListener('keyup', (event) => {
 });
 
 // écouter le clic sur le bouton de favoris, pour afficher les favoris
+favorisBtn.addEventListener('click', showFavorites);
+
+// Function to render search results
+function renderSearchResults(books) {
+    container.innerHTML = '';
+    books.forEach(book => {
+        const bookCard = createBookCard(book);
+        container.appendChild(bookCard);
+    });
+}
+
+// Function to render favorited books
+function renderFavorites() {
+    container.innerHTML = '';
+    favorites.forEach(id => {
+        fetch(`https://www.googleapis.com/books/v1/volumes/${id}`)
+            .then(response => response.json())
+            .then(book => {
+                const bookCard = createBookCard(book);
+                container.appendChild(bookCard);
+            })
+            .catch(err => {
+                console.log(err);
+                container.innerHTML = '<h2>Something went wrong</h2>';
+            });
+    });
+}
+
+// Function to create a book card
+function createBookCard(book) {
+    const bookCard = document.createElement('div');
+    bookCard.classList.add('book-card');
+
+    const maxChars = 15;
+    const titleText = book.volumeInfo.title;
+    const displayTitle = titleText.length > maxChars ? titleText.substring(0, maxChars) + '...' : titleText;
+
+    const maxLetter = 15;
+    let displayAuthors = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown';
+    displayAuthors = displayAuthors.length > maxLetter ? displayAuthors.substring(0, maxLetter) + '...' : displayAuthors;
+
+    const thumbnail = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.thumbnail : 'https://img.freepik.com/vecteurs-libre/pile-design-plat-dessine-main-illustration-livres_23-2149341898.jpg?size=338&ext=jpg&ga=GA1.1.1546980028.1711324800&semt=sph';
+
+    const favorited = favorites.includes(book.id);
+    const favoriButton = document.createElement('button');
+    favoriButton.textContent = favorited ? 'Retirer des favoris' : 'Ajouter aux favoris';
+    favoriButton.classList.add('favoris');
+    favoriButton.dataset.id = book.id;
+    favoriButton.style.backgroundColor = favorited ? 'red' : '#efefef';
+
+    favoriButton.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        const isFavori = !favorites.includes(id);
+        if (isFavori) {
+            favorites.push(id);
+            e.target.textContent = 'Retirer des favoris';
+            e.target.style.backgroundColor = 'red';
+        } else {
+            const index = favorites.indexOf(id);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            }
+            e.target.textContent = 'Ajouter aux favoris';
+            e.target.style.backgroundColor = '#efefef';
+        }
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    });
+
+    favoriButton.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        console.log(id);
+        const isFavori = favoriButton.classList.toggle('isFavori');
+        fetch('favorite.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ bookId: id })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); // Assuming PHP script sends back some response
+        })
+        .then(data => {
+            console.log(data); // Assuming PHP script sends back some response
+            // Handle UI changes or further logic if needed
+        })
+        .catch(error => {
+            console.error('There was a problem with your fetch operation:', error);
+        });
+    });
+
+    bookCard.innerHTML = `
+        <img src="${thumbnail}" alt="${thumbnail}">
+        <h2 title="${book.volumeInfo.title}">${displayTitle}</h2>
+        <p title="${book.volumeInfo.authors}">${displayAuthors}</p>
+        <p>${book.volumeInfo.publishedDate}</p>
+        <button><a href="${book.volumeInfo.previewLink}" target="_blank">Preview</a></button>
+    `;
+    bookCard.appendChild(favoriButton);
+
+    return bookCard;
+}
+
+// Function to handle search
+function search() {
+    const maxResults = 20;
+    const startIndex = 0;
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${input.value}+subject:${select.value}&startIndex=${startIndex}&maxResults=${maxResults}&langRestrict=fr`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const books = data.items;
+            if (books) {
+                renderSearchResults(books);
+            } else {
+                container.innerHTML = '<h2>No books found</h2>';
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            container.innerHTML = '<h2>Something went wrong</h2>';
+        });
+}
+
+// Initial rendering of favorites
+showFavorites();
+
+// Event listeners
+btn.addEventListener('click', search);
+input.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        search();
+    }
+});
 favorisBtn.addEventListener('click', showFavorites);
