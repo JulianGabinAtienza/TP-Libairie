@@ -22,7 +22,7 @@ if (isset($_SESSION["user_id"])) {
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <link rel="stylesheet" href="../CSS/style.css">
-    <script src="../JS/favoris.js" defer></script>
+    <script src="../JS/indexDisplayFav.js" defer></script>
 </head>
 <body>
     <header>
@@ -34,7 +34,7 @@ if (isset($_SESSION["user_id"])) {
 
                 <?php if (isset($user)): ?>
 
-                    <li><a href="search.html">Search</a></li>
+                    <li><a href="search.php">Search</a></li>
                     <li><a href="profile.php">Profile</a></li>
                     <li><a href="logout.php">Log Out</a></li>
                     

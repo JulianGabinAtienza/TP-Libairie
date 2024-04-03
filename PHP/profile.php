@@ -127,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <?php if (isset($user)): ?>
 
-                    <li><a href="search.html">Search</a></li>
+                    <li><a href="search.php">Search</a></li>
                     <li><a href="profile.php">Profile</a></li>
                     <li><a href="logout.php">Log Out</a></li>
                     

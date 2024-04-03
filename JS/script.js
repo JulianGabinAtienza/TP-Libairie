@@ -105,34 +105,6 @@ function search() {
                         localStorage.setItem('favorites', JSON.stringify(favorites)); // Stocker les favoris dans le localStorage
                         console.log(isFavori ? 'Ajout du film aux favoris:' : 'Retrait du film des favoris:', book);
                     });
-
-                    favoriButton.addEventListener('click', (e) => {
-                        fetch('favorite.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ 
-                                id: id,
-                                avatar: avatar,
-                                title: title,
-                                authors: authors,
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.text(); // Assuming PHP script sends back some response
-                        })
-                        .then(data => {
-                            console.log(data); // Assuming PHP script sends back some response
-                            // Handle UI changes or further logic if needed
-                        })
-                        .catch(error => {
-                            console.error('There was a problem with your fetch operation:', error);
-                        });
-                    });
                     container.appendChild(bookCard);
                 })
             } else {
